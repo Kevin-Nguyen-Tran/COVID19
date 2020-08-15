@@ -72,10 +72,10 @@ deaths <- ggplot(data = FL_data, mapping = aes(x = date, y = death)) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
+#random new comment to test amending commits
 
 
-
-
+#some additional code for testing amending of commits
 
 
 
