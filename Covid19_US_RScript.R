@@ -5,7 +5,7 @@ library(lubridate) #to modify date-time entries
 library(scales) #allows to modify scientific notation for values
 
 #read the data set into RStudio and stored into object called covid19_data
-covid19_data <- read.csv("C:/Users/Kevin/Desktop/COVID19 Project #1/us_states_covid19_daily.csv")
+covid19_data <- read.csv("C:/Users/Kevin/Desktop/COVID19/us_states_covid19_daily.csv")
 
 data <- as_tibble(covid19_data) #changes data set into a tibble (used in conjunction with tidyverse functions)
 
@@ -72,10 +72,6 @@ deaths <- ggplot(data = FL_data, mapping = aes(x = date, y = death)) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
-#random new comment to test amending commits
-
-
-#some additional code for testing amending of commits
 
 
 
