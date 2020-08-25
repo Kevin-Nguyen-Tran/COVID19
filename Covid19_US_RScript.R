@@ -72,9 +72,26 @@ deaths <- ggplot(data = FL_data, mapping = aes(x = date, y = death)) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
+# Conducting a Independent 2-sample t-test and CI to see if Florida and California's death rate differ 
+# as the states with the highest amounts of cases as of August 2020.
+# This t-test will tell us how significant the difference of death rates are between Florida and California
+# Null Hypothesis (Ho): The death rate of Florida and California are the same (do not differ)
+# Alternative Hypothesis (Ha): The death rate of Florida and California are different (not equal to zero)
 
+#To test the hypothesis, we will use the t.test(). However, we will need the data set to show data for only FL and CA
+FL_CA_data <- data %>%
+  filter(state == "FL" | state == "CA") %>%
+  arrange(state, date) %>%
+  select(date : state, death)
 
+#Visualize the variance between the two states with a box plot! As we can see, CA has more variability then FL over the same time frame
+ggplot(data = FL_CA_data) +
+  geom_boxplot(aes(x = state, y = death))
 
-
+#Now we can run the t.test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, 95% conf int and variance is not equal and they are independent
+t.test(FL_CA_data$death ~ FL_CA_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+#p-value is close to zero, therefore we can reject our null hypothesis that there is no difference in death rates
+#with 95% confidence, we can say that the mean within the sample or its extremes fall between 767.51 to 1929.88
+#since zero is not in the confidence interval as well, we can reject the null hypothesis with 95% confidence.
 
 
