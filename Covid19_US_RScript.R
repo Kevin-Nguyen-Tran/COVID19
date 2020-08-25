@@ -72,6 +72,13 @@ deaths <- ggplot(data = FL_data, mapping = aes(x = date, y = death)) +
   theme(plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
+# Look at total number of deaths per state (from inception to 2020-08-07)
+death_cases <- data %>%
+  filter(date == "2020-08-07") %>%
+  arrange(desc(death)) %>%
+  select(date : state, death)
+
+
 # Conducting a Independent 2-sample t-test and CI to see if Florida and California's death rate differ 
 # as the states with the highest amounts of cases as of August 2020.
 # This t-test will tell us how significant the difference of death rates are between Florida and California
@@ -86,7 +93,7 @@ FL_CA_data <- data %>%
 
 #Visualize the variance between the two states with a box plot! As we can see, CA has more variability then FL over the same time frame
 ggplot(data = FL_CA_data) +
-  geom_boxplot(aes(x = state, y = death))
+  geom_boxplot(aes(x = state, y = death)) 
 
 #Now we can run the t.test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, 95% conf int and variance is not equal and they are independent
 t.test(FL_CA_data$death ~ FL_CA_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
@@ -105,11 +112,75 @@ FL_TX_data <- data %>%
 
 #Visualize the variance between the two states with a box plot! As we can see, FL has more variability then TX over the same time frame
 ggplot(data = FL_TX_data) +
-  geom_boxplot(aes(x = state, y = death))
+  geom_boxplot(aes(x = state, y = death)) +
+  coord_flip()
 
 #Now we can run the t.test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, 95% conf int and variance is not equal and they are independent
 t.test(FL_TX_data$death ~ FL_TX_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
 #p-value is less than alpha = 5%, therefore we can reject our null hypothesis that there is no difference in death rates between the 2 states
 #with 95% confidence, we can say that the difference within means fall between 98.05 to 1014.56
 #since zero is not in the confidence interval as well, we can reject the null hypothesis with 95% confidence.
+
+#--------------------------------------------------------------------------------------------------------------
+#analyzing the TX box plot with the variance in number of deaths, it shows that there was a huge spike of deaths
+#by the outliers shown between 6,000 to 8,000 deaths. Based on that, could we hypothesize that the rate of death
+#is greater in Texas than in Florida?
+
+#Ho: The rate of death in Texas is the same as that of Florida
+#Ha: The rate of death in Texas in greater than that of Florida
+
+#Visualize the variance between the two states with a box plot! As we can see, FL has more variability then TX over the same time frame
+ggplot(data = FL_TX_data) +
+  geom_boxplot(aes(x = state, y = death)) +
+  coord_flip()
+
+#data set used to test this hypothesis
+View(FL_TX_data)
+
+#Fitting a non-linear regression for the relationship between Y = death, X1 = date, and X2 = state (TX and FL)
+ggplot(data = FL_TX_data, mapping = aes(x = date, y = death, color = state)) +
+  geom_point() +
+  geom_smooth()
+
+#Calculating the average growth rate per day for each respective state 
+death_TX <- FL_TX_data %>%
+  filter(state == "TX") %>%
+  mutate(diff_day = date - lag(date),
+         diff_death = death - lag(death),
+         rate_percent = diff_death/lag(death) * 100)
+  
+#now we can calculate the average rate of growth:
+average_death_rate_TX <- mean(death_TX$rate_percent, na.rm = TRUE)
+#Average rate of death is 7.14% per day in TX.
+
+#Now we can repeat for FL:
+death_FL <- FL_TX_data %>%
+  filter(state == "FL") %>%
+  mutate(diff_day = date - lag(date),
+         diff_death = death - lag(death),
+         rate_percent = diff_death/lag(death) * 100) #Final Value - Starting Value / Starting Value * 100
+
+#now we can calculate the average rate of growth:
+average_death_rate_FL <- mean(death_FL$rate_percent, na.rm = TRUE)
+#Average rate of death is 6.13% per day in TX.
+
+#Average rate of death over a 5 month period between March 2020 and August 2020, TX showed a greater death rate
+#visualise on a scatter plot and adding a line of best fit as shown below
+
+death_FL_TX <- rbind(death_FL, death_TX) #combining the two data frames together to visualize death rates 
+
+ggplot(data = death_FL_TX, mapping = aes(x = date, y = diff_death, color = state)) +
+  geom_point() +
+  geom_smooth(se = FALSE) #added line of best fit to show death rates per state
+
+
+
+
+
+
+
+
+
+
+
 
