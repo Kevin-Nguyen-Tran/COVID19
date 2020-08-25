@@ -91,7 +91,25 @@ ggplot(data = FL_CA_data) +
 #Now we can run the t.test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, 95% conf int and variance is not equal and they are independent
 t.test(FL_CA_data$death ~ FL_CA_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
 #p-value is close to zero, therefore we can reject our null hypothesis that there is no difference in death rates
-#with 95% confidence, we can say that the mean within the sample or its extremes fall between 767.51 to 1929.88
+#with 95% confidence, we can say that the difference within means fall between 767.51 to 1929.88
 #since zero is not in the confidence interval as well, we can reject the null hypothesis with 95% confidence.
 
+#___________________________________________________________________________________________________________________
+
+#To test the hypothesis, we will use the t.test(). However, we will need the data set to show data for only FL and TX
+#We have decided to compare FL and TX due to similar # of total cases (FL = 594,287, TX = 577,537)
+FL_TX_data <- data %>%
+  filter(state == "FL" | state == "TX") %>%
+  arrange(state, date) %>%
+  select(date : state, death)
+
+#Visualize the variance between the two states with a box plot! As we can see, FL has more variability then TX over the same time frame
+ggplot(data = FL_TX_data) +
+  geom_boxplot(aes(x = state, y = death))
+
+#Now we can run the t.test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, 95% conf int and variance is not equal and they are independent
+t.test(FL_TX_data$death ~ FL_TX_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
+#p-value is less than alpha = 5%, therefore we can reject our null hypothesis that there is no difference in death rates between the 2 states
+#with 95% confidence, we can say that the difference within means fall between 98.05 to 1014.56
+#since zero is not in the confidence interval as well, we can reject the null hypothesis with 95% confidence.
 
