@@ -272,9 +272,14 @@ ggplot(data = death_FL_TX_CA, mapping = aes(x = date, y = diff_death, color = st
 
 #-------------------------------------------------------------------------------------------------------------------------------
 
+# Start with filtering the data set to show the recovery from positive cases in FL, CA, and TX.
+recovery_data <- data %>%
+  filter(state == "FL" | state == "CA" | state == "TX") %>%
+  arrange(state, date) %>%
+  select(date : state, recovered)
 
-
-
+#Unfortunately, recovery data is not available within this data set for Florida and California.
+#Therefore, recovery is outside the scope of this data set and further research is needed.
 
 
 
