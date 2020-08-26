@@ -113,7 +113,14 @@ FL_TX_data <- data %>%
 #Visualize the variance between the two states with a box plot! As we can see, FL has more variability then TX over the same time frame
 ggplot(data = FL_TX_data) +
   geom_boxplot(aes(x = state, y = death)) +
-  coord_flip()
+  coord_flip() +
+  labs(x = "Deaths", 
+       y = "State",
+       title = "Deaths in Florida vs Texas",
+       subtitle = "March 2020 - August 2020",
+       caption = "Source: https://covidtracking.com/") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
 #Now we can run the t.test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, 95% conf int and variance is not equal and they are independent
 t.test(FL_TX_data$death ~ FL_TX_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
@@ -132,7 +139,14 @@ t.test(FL_TX_data$death ~ FL_TX_data$state, mu = 0, alt = "two.sided", conf = 0.
 #Visualize the variance between the two states with a box plot! As we can see, FL has more variability then TX over the same time frame
 ggplot(data = FL_TX_data) +
   geom_boxplot(aes(x = state, y = death)) +
-  coord_flip()
+  coord_flip() +
+  labs(x = "Deaths", 
+       y = "State",
+       title = "Deaths in Florida vs Texas",
+       subtitle = "March 2020 - August 2020",
+       caption = "Source: https://covidtracking.com/") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
 #data set used to test this hypothesis
 View(FL_TX_data)
@@ -140,7 +154,14 @@ View(FL_TX_data)
 #Fitting a non-linear regression for the relationship between Y = death, X1 = date, and X2 = state (TX and FL)
 ggplot(data = FL_TX_data, mapping = aes(x = date, y = death, color = state)) +
   geom_point() +
-  geom_smooth()
+  geom_smooth() +
+  labs(x = "Date", 
+       y = "Deaths",
+       title = "Deaths Over Time in Florida vs Texas",
+       subtitle = "March 2020 - August 2020",
+       caption = "Source: https://covidtracking.com/") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
 #Calculating the average growth rate per day for each respective state 
 death_TX <- FL_TX_data %>%
@@ -165,13 +186,24 @@ average_death_rate_FL <- mean(death_FL$rate_percent, na.rm = TRUE)
 #Average rate of death is 6.13% per day in TX.
 
 #Average rate of death over a 5 month period between March 2020 and August 2020, TX showed a greater death rate
-#visualise on a scatter plot and adding a line of best fit as shown below
+#visualize on a scatter plot and adding a line of best fit as shown below
 
 death_FL_TX <- rbind(death_FL, death_TX) #combining the two data frames together to visualize death rates 
 
 ggplot(data = death_FL_TX, mapping = aes(x = date, y = diff_death, color = state)) +
   geom_point() +
-  geom_smooth(se = FALSE) #added line of best fit to show death rates per state
+  geom_smooth(se = FALSE) + #added line of best fit to show death rates per state
+  labs(x = "Date", 
+       y = "Deaths per Day",
+       title = "Rapid Growth of Texas Death Rate",
+       subtitle = "March 2020 - August 2020",
+       caption = "Source: https://covidtracking.com/") +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+#As shown in July, TX had a rapid increase in death rate vs FL.
+
+
+
 
 
 
