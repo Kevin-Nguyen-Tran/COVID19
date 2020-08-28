@@ -1,7 +1,7 @@
 # COVID-19 Analysis - Death Rate
 #### Kevin Tran
 
-<<<<<<< HEAD
+
 ## Prerequisites
 ```{r setup}
 rm(list = ls()) #removes all variables stored previously in Environment (good habit to include)
@@ -19,8 +19,6 @@ data <- data %>%
   mutate(date = ymd(date)) #fixed formatting with dates to YYYY-MM-DD
 ```
 
-=======
->>>>>>> 740c865f348804f1bdd8f83c1581079c84cc377a
 ## Abstract
 
 This analysis deals with exploring death trends in the United States, specifically having Florida as the focal point. The exploration in Florida begins with analyzing positive cases/trends, visualizing the positive and negative cases, and inspecting the total number of deaths. On the basis of population comparisons, Florida will be compared to California and Texas due to having the most similar total number of positive COVID-19 cases. The two main factors that will be investigated between the states are the average percent increase of deaths per day and the average deaths per day. The data represented in this analysis can be found on <https://covidtracking.com/> and will cover the time frame of 2020-03-04 to 2020-08-07.
