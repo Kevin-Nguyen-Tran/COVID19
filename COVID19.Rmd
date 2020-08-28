@@ -1,5 +1,5 @@
 ---
-title: "COVID-19 Analysis - Florida, California, and Texas"
+title: "COVID-19 Analysis - Death Rate"
 author: "Kevin Tran"
 date: "8/27/2020"
 output: html_document
@@ -21,18 +21,42 @@ data <- data %>%
   mutate(date = ymd(date)) #fixed formatting with dates to YYYY-MM-DD
 ```
 
-## Analysis Breakdown
+## Abstract
 
-This is a analysis on COVID-19 and exploring the positive cases/trends, visualizing the difference in positive and negative cases, and inspecting death trends. California, Florida, and Texas are the top 3 states with the most positive cases in the U.S. We will compare Florida to Texas and California to analyze average % increase of deaths per day and average deaths per day. The data represented in this analysis can be found on <https://covidtracking.com/> and will cover the time frame of 2020-03-04 to 2020-08-07.
+This analysis deals with exploring death trends in the United States, specifically having Florida as the focal point. The exploration in Florida begins with analyzing positive cases/trends, visualizing the positive and negative cases, and inspecting the total number of deaths. On the basis of population comparisons, Florida will be compared to California and Texas due to having the most similar total number of positive COVID-19 cases. The two main factors that will be investigated between the states are the average percent increase of deaths per day and the average deaths per day. The data represented in this analysis can be found on <https://covidtracking.com/> and will cover the time frame of 2020-03-04 to 2020-08-07.
+
+**The questions asked during the analysis were:**
+
+* How does Florida compare to other states in the U.S, in terms of, positive COVID-19 cases, total numbers of deaths, death rate, etc?
+
+* Which states currently (2020-08-07) have the most positive cases?
+
+* Since positive cases and deaths are positively correlated, which state has the highest death rate? Can we hypothesize that the state with the most total deaths has the highest death rate?
+
+* Based on linear models, can we predict which states will have the most deaths in the long run?
+
+**The data analysis will be broken down by the following sections:**
+
+* Florida Data
+
+* Data for All States
+
+* Narrow Focus - Florida, California, and Texas
+
+* Florida vs California
+
+* Florida vs Texas
+
+* Florida vs California vs Texas
 
 ## Florida Data
 Below is the data on Florida and we will look at the following:
 
-* Positive cases/trends
+* Positive Cases/Trends
 
-* The difference in positive and negative cases
+* Total Positive Cases vs Total Negative Cases
 
-* Death trends
+* Death Trends
 
 ```{r, include = FALSE}
 # Desired data for only Florida
@@ -41,7 +65,7 @@ FL_data <- data %>%
   select(c(date:hospitalizedCumulative, recovered, death))
 ```
 
-**Positive cases/trends in Florida:**
+**Positive Cases/Trends in Florida:**
 ```{r,message=FALSE}
 ggplot(data = FL_data, mapping = aes(x = date, y = positive)) +
   geom_point(position = "jitter", alpha = 1/5) +
@@ -68,7 +92,7 @@ FL_data_by_month <- FL_data %>%
   select(month_name, everything())
 ```
 
-**Line chart to show positive vs negative cases in Florida:**
+**Line Chart to Show Total Positive vs Total Negative Cases in Florida:**
 ```{r}
 colors <- c("positive_cases" = "red", "negative_cases" = "green") #added to make custom/manual legend for line chart
 
@@ -88,7 +112,7 @@ ggplot(data = FL_data_by_month) +
         legend.position = "right")
 ```
 
-**Death trends in Florida:**
+**Death Trends in Florida:**
 ```{r, message=FALSE, warning=FALSE}
 ggplot(data = FL_data, mapping = aes(x = date, y = death)) +
   geom_point(position = "jitter", alpha = 1/5) +
@@ -104,9 +128,10 @@ ggplot(data = FL_data, mapping = aes(x = date, y = death)) +
 ```
 
 ## Data for All States
-The data below will show total cases (positive and negative) and total deaths for all states:
 
-(The data will be restricted to the top 10 states for visibility purposes)
+**The data below will show total cases (positive and negative) and total deaths for all states:**
+
+*(The data will be restricted to the top 10 states for visibility purposes)*
 ```{r}
 total_cases_all <- data %>%
   filter(date == "2020-08-07") %>%
@@ -125,7 +150,9 @@ death_cases <- data %>%
 knitr::kable(death_cases[1:10, ], caption = "Total Number of Deaths for All States (Top 10)")
 ```
 
-**We will then narrow our focus to Florida, California, and Texas to show total cases (positive and negative) and total deaths for each respective state:**
+## Narrow Focus
+
+**We will narrow our focus to Florida, California, and Texas to show total cases (positive and negative) and total deaths for each respective state:**
 ```{r}
 states_of_interest <- c("FL", "CA", "TX")
 
@@ -139,9 +166,12 @@ knitr::kable(total_cases, caption = "Total Positive Cases in California, Florida
 ```
 
 As shown in the above data set: California has more positive cases than Florida and Florida has more positive cases than Texas. 
-California, Florida, and Texas are the top 3 states with the most positive cases in the U.S. Due to similar sample sizes, we will compare Florida to these states to analyze average % increase of deaths and average deaths per day to see if they differ statistically.
 
-Below we will see California (10,011 deaths) accounts for the most deaths, followed by Texas (8,096 deaths), and then by Florida (8,051 deaths). - As of 2020-08-07:
+California, Florida, and Texas are the top 3 states with the most positive cases in the U.S. 
+
+Because California and Texas have the most similar amount of total positive cases among all states, we will compare Florida to these states to analyze the average percent increase of deaths and average deaths per day to see if they differ statistically.
+
+**Below we will see California (10,011 deaths) accounts for the most deaths, followed by Texas (8,096 deaths), and then by Florida (8,051 deaths). - As of 2020-08-07:**
 ```{r, message=FALSE, warning=FALSE}
 FL_TX_CA_data <- data %>%
   filter(state == "FL" | state == "TX" | state == "CA") %>%
@@ -163,7 +193,7 @@ ggplot(data = FL_TX_CA_data, mapping = aes(x = date, y = death, color = state)) 
 ## Florida vs California
 We will first start by comparing the average difference in deaths between Florida and California. To do so, we will conduct an Independent 2-sample t-test and generate a confidence interval to see if Florida and California's average deaths differ as the states that account for the most positive cases in the U.S.
 
-This t-test will tell us how significant the average difference of deaths are between Florida and California
+This t-test will tell us how significant the average difference of death is between Florida and California
 
 * Null Hypothesis (Ho): The average difference of death for Florida and California are the same (do not differ and equal to zero)
 
@@ -193,12 +223,12 @@ ggplot(data = FL_CA_data) +
         plot.subtitle = element_text(hjust = 0.5))
 ```
 
-Now we can run the t-test keeping in mind, our null hypothesis is equal to zero, alternative is two.sided, confidence interval is set to 95%, variance is not equal (as shown in the box plot above) and they are independent populations.
+Now we can run the t-test keeping in mind, our null hypothesis is equal to zero, the alternative is two.sided, the confidence interval is set to 95%, the variance is not equal (as shown in the box plot above) and they are independent populations.
 
 ```{r}
 t.test(FL_CA_data$death ~ FL_CA_data$state, mu = 0, alt = "two.sided", conf = 0.95, var.eq = FALSE, paired = FALSE)
 ```
-The output tell us that the p-value is close to zero, therefore we can reject our null hypothesis that there is no difference in average deaths. The difference within means fall between 767.51 to 1929.88 and since zero is not within the confidence interval as well, we can reject the null hypothesis with 95% confidence.
+The output tells us that the p-value is close to zero, therefore we can reject our null hypothesis that there is no difference in average deaths. The difference within means falls between 767.51 to 1929.88 and since zero is not within the confidence interval as well, we can reject the null hypothesis with 95% confidence.
 
 Now that we confirmed our mean difference is statistically significant, we can compare the death rates between Florida and California.
 
@@ -248,12 +278,12 @@ average_deaths_per_day_FL <- mean(death_FL$diff_death, na.rm = TRUE)
 ```
 The average deaths per day in Florida is 54.02
 
-*We will utilize the above averages in a ANOVA test to compare statistical significance at the end of the analysis.*
+*We will utilize the above averages in an ANOVA (Analysis of Variance) test to compare statistical significance at the end of the analysis.*
 
 ## Florida vs Texas
-We will first start by comparing the average difference in deaths between Florida and Texas. To do so, we will conduct an Independent 2-sample t-test and generate a confidence interval to see if Florida and Texas' average deaths differ.
+Again, we will first start by comparing the average difference in deaths between Florida and Texas. We will conduct another Independent 2-sample t-test and generate a confidence interval to see if Florida and Texas' average deaths differ.
 
-This t-test will tell us how significant the average difference of deaths are between Florida and Texas.
+This t-test will tell us how significant the average difference of death is between Florida and Texas.
 
 * Null Hypothesis (Ho): The average difference of death for Florida and Texas are the same (do not differ and equal to zero)
 
@@ -293,7 +323,7 @@ Since zero is not in the confidence interval as well, we can reject the null hyp
 After analyzing the box plot that shows the variance between Texas and Florida, it shows that there was a spike in deaths by the outliers. Which is shown between 6,000 to 8,000 deaths. Based on that, could we hypothesize that the rate of death is greater in Texas than in Florida?
 
 * Ho: The rate of death in Texas is the same as that of Florida
-* Ha: The rate of death in Texas in greater than that of Florida
+* Ha: The rate of death in Texas is greater than that of Florida
 
 **We will tidy our data to only show death statistics in Texas:** 
 
@@ -325,11 +355,14 @@ average_deaths_per_day_FL <- mean(death_FL$diff_death, na.rm = TRUE)
 ```
 The average deaths per day in Florida is 54.02
 
-*We will utilize the above averages in a ANOVA test to compare statistical significance, between all three states, in the next section!*
+*We will utilize the above averages in an ANOVA (Analysis of Variance) test to compare statistical significance, between all three states, in the next section!*
 
 ## Florida vs California vs Texas
-We will compare the data for California, Florida, and Texas in regards to average percent increase in deaths per day and average deaths per day.
-We will visualize via table and visualize the percent increase of death via scatter plot. Lastly, we will compare all 3 states in regards to the above two factors to test statistical significance with an ANOVA test!
+We will compare the data for Florida, California, and Texas in regards to the average percent increase in deaths per day and average deaths per day.
+
+We will organize all relevant data on a table and visualize the percent increase of death on a scatter plot with a regression line. 
+
+Lastly, we will compare all three states regarding the above two factors (average percent increase in deaths per day and average deaths per day) to test statistical significance with an ANOVA (Analysis of Variance) test!
 
 **Below is a table that shows the relevant statistics for all three states:**
 
@@ -349,8 +382,8 @@ knitr::kable(three_state_statistics, caption = "Relevant State Statistics")
 
 * It is also interesting to see that Texas, with the lowest amount of positive cases, has the highest average percent increase in deaths.
 
-**We will fit a non-linear regression for the relationship between Y = death rate, X1 = date, and X2 = state (TX, FL and CA)
-This will show the rate of death over 5 months, between TX, FL, and CA.**
+**We will fit a non-linear regression line for the relationship between Y = death rate, X1 = date, and X2 = state (TX, FL, and CA)
+This will show the rate of death over 5 months, between Florida, California, and Texas.**
 
 ```{r, warning=FALSE, message=FALSE}
 death_FL_TX_CA <- rbind(death_FL, death_TX, death_CA) # Combining the three data frames together to visualize death rates 
@@ -367,15 +400,15 @@ ggplot(data = death_FL_TX_CA, mapping = aes(x = date, y = diff_death, color = st
         plot.subtitle = element_text(hjust = 0.5))
 ```
 
-Based on percent increase of deaths per day, we can conclude visually and mathematically that Texas has the highest at 7.14% increase per day, Florida with 6.13% increase per day, and California with the lowest at 5.81% increase per day.
+Based on the percent increase of deaths per day, we can conclude visually and mathematically that Texas has the highest at 7.14% increase per day, Florida with a 6.13% increase per day, and California with the lowest at 5.81% increase per day.
 
-**Is this statistically significant?**
+*Is this statistically significant?*
 
-We can run an ANOVA (Analysis of Variance) test to see if the average % increase of deaths per day are equal (not statistically significant) within the 3 states.
+#### **We can run an ANOVA (Analysis of Variance) test to see if the average % increase of deaths per day are equal (not statistically significant) within the three states.**
 
 If they are not equal we can run further tests to see which one(s) are different.
 
-* Our Null Hypothesis (Ho) is: The average percent increase of deaths per day between the 3 states are not significantly different.
+* Our Null Hypothesis (Ho) is: The average percent increase of deaths per day between the three states is not significantly different.
 
 * Our Alternative Hypothesis (Ha) is: At least one of the states will have a difference in average percent increase of deaths per day. (the ANOVA test will not tell us which one differs)
 
@@ -384,7 +417,7 @@ ANOVA1 <- aov(death_FL_TX_CA$rate_percent ~ death_FL_TX_CA$state)
 summary(ANOVA1) # To run a more informative summary
 ```
 
-Our p-value is 57.9%. Therefore, we fail to reject our null hypothesis. This means that the average percent increase of deaths per day between the 3 states are not significantly different.
+Our p-value is 57.9%. Therefore, we fail to reject our null hypothesis. This means that the average percent increase of deaths per day between the three states is not significantly different.
 
 ```{r}
 plot(TukeyHSD(ANOVA1)) # To visualize, the means of death rate per day do not differ from each other.
@@ -392,7 +425,7 @@ plot(TukeyHSD(ANOVA1)) # To visualize, the means of death rate per day do not di
 
 This visual shows that the means of death rate per day do not statistically differ from each other.
 
-**Next, we can run an ANOVA test to see if the average deaths per day are equal (not statistically significant) within the 3 states.**
+#### **Next, we can run an ANOVA test to see if the average deaths per day are equal (not statistically significant) within the three states.**
 
 * Our Null Hypothesis (Ho) is: The average deaths per day between the 3 states are not significantly different.
 
@@ -411,7 +444,23 @@ plot(TukeyHSD(ANOVA2)) # To visualize, the means of deaths per day do not differ
 
 This visual shows that the average deaths per day do not statistically differ from each other.
 
+## Conclusion
 
+The death rate and total deaths within a state are imperative to understanding the conditions and responsiveness to the current global pandemic, COVID-19. The increase of death rate as shown in Florida, California, and Texas continues to contribute to the grimness of reality we live in today. As shown in this analysis there are certain states, such as Texas, that are showing a rapid growth in deaths that exceed other states with similar or substantially more positive cases.
+
+As shown in the statistical analysis, the mean differences between death rates are not significant among the independent populations. Therefore, further analysis is needed to remedy this growth issue that is shared between the populations. 
+
+**Opportunities for further analysis could be focusing on the above states and researching the following:** 
+
+* The effectiveness of the state lockdowns
+
+* The consequences of premature state reopenings
+
+* The protocol adherence of the state residents
+
+* The process of recording COVID related deaths
+
+* The recovery rate of positive COVID-19 cases
 
 
 
